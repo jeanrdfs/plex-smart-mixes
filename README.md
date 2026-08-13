@@ -50,11 +50,45 @@ Once you've done one, the rest take about a minute each.
 6. Fill **LIMIT TO** only when the recipe asks for one
 7. **Save As…** → name it → **Save as Smart Playlist**
 
+**Sorting in Tracks view works differently than Albums view.** Albums view has a
+sort dropdown. Tracks view doesn't, instead, click the column header itself
+(Plays, Date Added, Rating, etc.) to sort by that field, click it again to flip
+between ascending and descending. It's not a dropdown, but it's not broken either,
+it's just a different control for the same thing.
+
 ### Match all vs Match any
 
 Most recipes use **Match all**, where every row must be true. A few need a nested
 **Match any** block, which is the `⋮` button beside the `+`. The mood playlists
 use it to catch several mood tags at once.
+
+### A note on Mood and Style fields
+
+`Track Mood` and `Album Style` only support **is**, not **contains**, in the
+current Plex Web filter editor. If a recipe below shows `contains`, build it as
+one **is** row per value inside a **Match any** group instead. For example:
+
+```
+Match any
+Track Mood   is   melancholy
+Track Mood   is   reflective
+Track Mood   is   sombre
+Track Mood   is   dreamy
+```
+
+rather than a single `Track Mood contains melancholy` row, which isn't available
+as an option.
+
+### A note on Album Critic Rating
+
+This field shows as a five-star click control in Plex Web, not a numeric input.
+There's no way to type a decimal like `7.9`. Use the star equivalent instead,
+roughly `rating ÷ 2`, so 7.9/10 becomes **4 stars**. It's an approximation, not
+an exact conversion.
+
+It's also not currently sortable directly. **Popularity** is a reasonable
+stand-in if you want a ranked order, it's independent of your own play count, so
+it won't just re-surface whatever you've already played the most.
 
 ---
 
@@ -295,9 +329,11 @@ better populated.
 > further away.
 
 ```
-Match all
-Track Mood     contains   melancholy
-  └ nested Match any: melancholy / reflective / sombre / dreamy
+Match any
+Track Mood   is   melancholy
+Track Mood   is   reflective
+Track Mood   is   sombre
+Track Mood   is   dreamy
 ```
 
 `10-late-night.png` · `10-late-night-bg.png` · `10-late-night-logo.png`
@@ -311,9 +347,9 @@ Track Mood     contains   melancholy
 
 ```
 Match any
-Track Mood     contains   energetic
-Track Mood     contains   rowdy
-Track Mood     contains   exuberant
+Track Mood   is   energetic
+Track Mood   is   rowdy
+Track Mood   is   exuberant
 ```
 
 `11-upbeat.png` · `11-upbeat-bg.png` · `11-upbeat-logo.png`
@@ -327,8 +363,10 @@ Track Mood     contains   exuberant
 
 ```
 Match all
-Album Style    contains   ambient
-  └ nested Match any: ambient / post-rock / instrumental
+  Match any
+  Album Style   is   ambient
+  Album Style   is   post-rock
+  Album Style   is   instrumental
 Track Plays    is greater than   0
 ```
 
@@ -343,8 +381,10 @@ Track Plays    is greater than   0
 ```
 Match all
 Track Rating   is greater than   2
-Track Mood     contains   warm
-  └ nested Match any: warm / laid-back / gentle
+  Match any
+  Track Mood   is   warm
+  Track Mood   is   laid-back
+  Track Mood   is   gentle
 ```
 
 `13-sunday-kitchen.png` · `13-sunday-kitchen-bg.png` · `13-sunday-kitchen-logo.png`
@@ -353,23 +393,36 @@ Track Mood     contains   warm
 
 ### The ones streaming can't do
 
-#### 14. Critics — *Were Right* · Selected
+#### 14. Critics Were Right — *Essentials* · Selected
 
-> Albums the critics raved about that you own and have never once pressed play
-> on. No streaming service can build this list, because none of them know what's
-> on your shelf.
+> Acclaimed albums you own with at least one track you've never played. No
+> streaming service can build this list, because none of them know what's on
+> your shelf.
 
 ```
 Match all
-Album Critic Rating  is greater than   7.9
-Album Plays          is                0
+Album Critic Rating  is greater than   ★★★★  (4 stars)
+Track Plays          is                0
 
-Limit 50 · Sort: Album Critic Rating (desc)
+Limit 50 · Sort: Popularity (desc)
 ```
 
-The best filter here. Best-reviewed at the top, so the first thing you see is the
-most defensible album you've been ignoring. Note `Album Plays` is a separate
-counter from `Track Plays` — it means the album was never opened at all.
+`Album Critic Rating` is a five-star click control in Plex Web, not a numeric
+field, there's no way to type `7.9` directly. Four stars is roughly the
+equivalent. It's not sortable on its own either, Popularity is a reasonable
+stand-in since it's independent of your own play count.
+
+This uses `Track Plays`, not `Album Plays`, on purpose. An earlier version
+filtered on `Album Plays is 0`, meaning the whole album had to be completely
+untouched, but that turned out to be a much stricter bar than it sounds:
+sample one track off a well-reviewed album years ago and it's disqualified
+forever. `Track Plays is 0` catches acclaimed albums where you've heard
+something but not most of it, which returns useful results for a lot more
+libraries.
+
+Want the stricter version back, whole album untouched, not just one track?
+Swap the second row for `Album Plays is 0`. It can return very few results,
+or none, depending on how much of your acclaimed music you've already sampled.
 
 `14-critics-were-right.png` · `14-critics-were-right-bg.png` · `14-critics-were-right-logo.png`
 
@@ -404,6 +457,11 @@ Limit 50 · Sort: Date Album Added (asc)
 ```
 
 Longest-neglected first. The sort is the guilt.
+
+**If this comes back empty**, that's not necessarily a bug, it can genuinely
+mean you've listened to at least one track off every album in your library
+that's over a year old. `Album Plays is 0` is a strict filter, unlike the star
+rating field above, it works correctly here, an empty result is a real result.
 
 `16-the-ghost-shelf.png` · `16-the-ghost-shelf-bg.png` · `16-the-ghost-shelf-logo.png`
 
@@ -634,6 +692,13 @@ files yourself first.
 
 **Start with eight or ten.** A crowded shelf is the problem you're trying to
 solve.
+
+**The same song can show up more than once** if it exists on multiple entries
+in your library, an original album, a greatest hits, a soundtrack, a box set.
+Plex doesn't have a native way to deduplicate by title across releases, so
+count-based playlists like On Repeat or Your Year can show what looks like the
+same track several times. No clean fix for this without manually tagging
+duplicates yourself.
 
 ---
 
