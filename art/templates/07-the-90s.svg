@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Plexamp cover template — The 90s
+  1000 x 1000, layered and named for easy editing in Illustrator, Figma, or Inkscape.
+
+  TO CHANGE THE DECADE / TEXT:
+    Edit the two <text> elements inside id="Title1" and id="Title2" near the bottom.
+
+  TO CHANGE THE COLOURS:
+    Edit the <stop> colours inside <linearGradient id="bgGradient"> and
+    <radialGradient id="bloom">. Everything else references these automatically.
+
+  FONT:
+    Set in Outfit (Bold for line 1, Regular for line 2), https://fonts.google.com/specimen/Outfit
+    If Outfit isn't installed, text falls back to system sans-serif, sizing may shift slightly.
+-->
+<svg width="1000" height="1000" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0" y1="0" x2="0.45" y2="1">
+      <stop offset="0%"   stop-color="#2e7d6e"/>
+      <stop offset="60%"  stop-color="#245a63"/>
+      <stop offset="100%" stop-color="#1b2a3a"/>
+    </linearGradient>
+
+    <radialGradient id="bloomTeal" cx="30%" cy="25%" r="55%">
+      <stop offset="0%"   stop-color="#6fd8c2" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#6fd8c2" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- optional subtle grain, delete this filter + its reference below if you don't want it -->
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="9" result="noise"/>
+      <feColorMatrix in="noise" type="saturate" values="0"/>
+    </filter>
+  </defs>
+
+  <!-- ================= Background ================= -->
+  <g id="Background">
+    <rect width="1000" height="1000" fill="url(#bgGradient)"/>
+    <rect width="1000" height="1000" fill="url(#bloomTeal)"/>
+    <rect width="1000" height="1000" filter="url(#grain)" opacity="0.06" style="mix-blend-mode:overlay"/>
+  </g>
+
+  <!-- ================= Plexamp mark (real triple-chevron) ================= -->
+  <g id="Logo" transform="translate(78,120)" color="#ffffff">
+    <polyline points="4.5,24 23.444,24 12.808,9.342 16.883,9.342 27.519,24 16.883,38.658 20.957,38.658 31.594,24 20.957,9.342 25.032,9.342 35.668,24 25.032,38.658 29.107,38.658 39.743,24 43.5,24"
+      fill="none" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round"
+      transform="scale(0.72)"/>
+  </g>
+
+  <g id="Wordmark">
+    <text x="128" y="154" font-family="Outfit, system-ui, sans-serif" font-weight="700"
+      font-size="38" letter-spacing="1.5" fill="#ffffff">PLEXAMP</text>
+  </g>
+
+  <!-- ================= Title ================= -->
+  <g id="Title1">
+    <text x="78" y="308" font-family="Outfit, system-ui, sans-serif" font-weight="700"
+      font-size="98" letter-spacing="-3.5" fill="#e6d24a">The 90s</text>
+  </g>
+
+  <g id="Title2">
+    <text x="78" y="426" font-family="Outfit, system-ui, sans-serif" font-weight="400"
+      font-size="98" letter-spacing="-3" fill="#ffffff">Mix</text>
+  </g>
+</svg>
