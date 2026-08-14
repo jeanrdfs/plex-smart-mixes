@@ -567,8 +567,8 @@ Album Type           is        Live
 
 ```
 Match any
-Album Type           is        Single
-Album Type           is        EP
+Album Format        is        Single
+Album Format        is        EP
 ```
 
 `23-b-sides.png` · `23-b-sides-bg.png` · `23-b-sides-logo.png`
